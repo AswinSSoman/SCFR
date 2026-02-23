@@ -14,7 +14,7 @@ Corresponding Author: nagarjun@iiserb.ac.in
     <ul>
       <li> Length_threshold_PCA_kmeans: contains data related to PCA loadings and the plots with SCFRs indicated by clade, cluster, coding status, GC content and repeat composition. Plots for every species are present within their respective folder. </li>
       <li> Exon_shadow: contains data of all exon shadows for 7 primate species. </li>
-      <li> Gene deserts: contains data related to intergenic and intronic gene deserts, and intergenic along with distribution plot. Contains a subfolder ```chromosome_wide_plots``` that has chromosome-wide analysis of gene desert distribution. </li>
+      <li> Gene deserts: contains data related to intergenic and intronic gene deserts, and intergenic along with distribution plot. Contains a subfolder `chromosome_wide_plots` that has chromosome-wide analysis of gene desert distribution. </li>
     </ul>
   </li>
 </ul>
