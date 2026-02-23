@@ -22,7 +22,12 @@ Corresponding Author: nagarjun@iiserb.ac.in
   </li>
   <li> Scripts: </li>
   <ul>
-    <li> </li>
+    <li> fourier_analysis: contains all scripts required for conducting discrete Fourier analysis </li>
+    <li> gene_deserts: Python scripts for the identification of gene deserts </li>
+    <li> PCA_kmeans: all scripts (Python + R) used for PCA-KMeans dimensional reduction and clustering analysis + scripts used for visualization of clusters </li>
+    <li> Plots: scripts used in generation of main figures </li>
+    <li> SCFR: scripts used in identification of SCFRs</li>
+    <li> exon_shadow: files used in analysis of exon shadow </li>
   </ul>
 </ul>
 
