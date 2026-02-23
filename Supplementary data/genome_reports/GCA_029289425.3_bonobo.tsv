@@ -1,0 +1,32 @@
+Assembly Accession	Assembly-unit accession	Chromosome name	GC Count	GC Percent	GenBank seq accession	Molecule type	Ordering	RefSeq seq accession	Role	Seq length	UCSC style name	Unlocalized Count	Sequence name
+GCF_029289425.2	Primary Assembly	1	95241209	42	CM055472.2	Chromosome		NC_073249.2	assembled-molecule	227705052			chr1_pat_hsa1
+GCF_029289425.2	Primary Assembly	2	77996168	39.5	CM068944.1	Chromosome		NC_085926.1	assembled-molecule	196431891			chr2_mat_hsa3
+GCF_029289425.2	Primary Assembly	3	72245527	38.5	CM055475.2	Chromosome		NC_073252.2	assembled-molecule	188614375			chr3_pat_hsa4
+GCF_029289425.2	Primary Assembly	4	69813369	39.5	CM055476.2	Chromosome		NC_073253.2	assembled-molecule	176551333			chr4_mat_hsa5
+GCF_029289425.2	Primary Assembly	5	74874396	39	CM055477.2	Chromosome		NC_073254.2	assembled-molecule	191151712			chr5_pat_hsa6
+GCF_029289425.2	Primary Assembly	6	78867945	40	CM055478.2	Chromosome		NC_073255.2	assembled-molecule	196309857			chr6_mat_hsa7
+GCF_029289425.2	Primary Assembly	7	65150067	40	CM055479.2	Chromosome		NC_073256.2	assembled-molecule	162793952			chr7_pat_hsa8
+GCF_029289425.2	Primary Assembly	8	60385464	41	CM055480.2	Chromosome		NC_073257.2	assembled-molecule	147028407			chr8_mat_hsa10
+GCF_029289425.2	Primary Assembly	9	56250456	41.5	CM055481.2	Chromosome		NC_073258.2	assembled-molecule	135750398			chr9_pat_hsa11
+GCF_029289425.2	Primary Assembly	10	57507545	40.5	CM055482.2	Chromosome		NC_073259.2	assembled-molecule	141815175			chr10_mat_hsa12
+GCF_029289425.2	Primary Assembly	11	51605157	41.5	CM055483.2	Chromosome		NC_073260.2	assembled-molecule	124758961			chr11_mat_hsa9
+GCF_029289425.2	Primary Assembly	12	51060232	40.5	CM055484.2	Chromosome		NC_073261.2	assembled-molecule	126551469			chr12_mat_hsa2a
+GCF_029289425.2	Primary Assembly	13	56793428	39	CM055485.2	Chromosome		NC_073262.2	assembled-molecule	144872268			chr13_mat_hsa2b
+GCF_029289425.2	Primary Assembly	14	42920142	37.5	CM055486.2	Chromosome		NC_073263.2	assembled-molecule	116126430			chr14_pat_hsa13
+GCF_029289425.2	Primary Assembly	15	42747959	40	CM055487.2	Chromosome		NC_073264.2	assembled-molecule	108452746			chr15_mat_hsa14
+GCF_029289425.2	Primary Assembly	16	38332413	41.5	CM055488.2	Chromosome		NC_073265.2	assembled-molecule	91859929			chr16_pat_hsa15
+GCF_029289425.2	Primary Assembly	17	35222690	36	CM055489.2	Chromosome		NC_073266.2	assembled-molecule	98270466			chr17_mat_hsa18
+GCF_029289425.2	Primary Assembly	18	44288790	44	CM055490.2	Chromosome		NC_073267.2	assembled-molecule	100427192			chr18_pat_hsa16
+GCF_029289425.2	Primary Assembly	19	44707522	44.5	CM055491.2	Chromosome		NC_073268.2	assembled-molecule	100792412			chr19_pat_hsa17
+GCF_029289425.2	Primary Assembly	20	32560310	46	CM055492.2	Chromosome		NC_073269.2	assembled-molecule	70721293			chr20_pat_hsa19
+GCF_029289425.2	Primary Assembly	21	32794023	42.5	CM055493.2	Chromosome		NC_073270.2	assembled-molecule	76791327			chr21_mat_hsa20
+GCF_029289425.2	Primary Assembly	22	18211458	38.5	CM055494.2	Chromosome		NC_073271.2	assembled-molecule	48483276			chr22_pat_hsa21
+GCF_029289425.2	Primary Assembly	23	27631325	43	CM068945.1	Chromosome		NC_085927.1	assembled-molecule	65052380			chr23_pat_hsa22
+GCF_029289425.2	Primary Assembly	X	63258915	39.5	CM055495.2	Chromosome		NC_073272.2	assembled-molecule	160241051			chrX_mat_hsaX
+GCF_029289425.2	Primary Assembly	Y	19372304	41.5	CM055496.2	Chromosome		NC_073273.2	assembled-molecule	46954669			chrY_pat_hsaY
+GCF_029289425.2	Primary Assembly	Un			JARIFH020000026.1	Chromosome		NW_026946709.1	unplaced-scaffold	93210			chr1522_pat_hsa1421_random_utig4-145
+GCF_029289425.2	Primary Assembly	Un			JARIFH020000027.1	Chromosome		NW_026946710.1	unplaced-scaffold	56087			chr1522_pat_hsa1421_random_utig4-147
+GCF_029289425.2	Primary Assembly	Un			JARIFH020000028.1	Chromosome		NW_026946711.1	unplaced-scaffold	50461			chr1522_pat_hsa1421_random_utig4-839
+GCF_029289425.2	Primary Assembly	Un			JARIFH020000029.1	Chromosome		NW_026946712.1	unplaced-scaffold	25162			chr1522_pat_hsa1421_random_utig4-95
+GCF_029289425.2	Primary Assembly	Un			JARIFH020000030.1	Chromosome		NW_026946713.1	unplaced-scaffold	155767			chr1522_pat_hsa1421_random_utig4-325
+GCF_029289425.2	non-nuclear	MT	7188	43.5	D38116.1	Mitochondrion		NC_001644.1	assembled-molecule	16563			MT

@@ -1,0 +1,25 @@
+Assembly Accession	Assembly-unit accession	Chromosome name	GC Count	GC Percent	GenBank seq accession	Molecule type	Ordering	RefSeq seq accession	Role	Seq length	UCSC style name	Unlocalized Count	Sequence name
+GCF_009914755.1	Primary Assembly	1	103081415	41.5	CP068277.2	Chromosome		NC_060925.1	assembled-molecule	248387328	chr1		1
+GCF_009914755.1	Primary Assembly	2	97657380	40	CP068276.2	Chromosome		NC_060926.1	assembled-molecule	242696752	chr2		2
+GCF_009914755.1	Primary Assembly	3	79313943	39.5	CP068275.2	Chromosome		NC_060927.1	assembled-molecule	201105948	chr3		3
+GCF_009914755.1	Primary Assembly	4	73811867	38	CP068274.2	Chromosome		NC_060928.1	assembled-molecule	193574945	chr4		4
+GCF_009914755.1	Primary Assembly	5	71952387	39.5	CP068273.2	Chromosome		NC_060929.1	assembled-molecule	182045439	chr5		5
+GCF_009914755.1	Primary Assembly	6	68182174	39.5	CP068272.2	Chromosome		NC_060930.1	assembled-molecule	172126628	chr6		6
+GCF_009914755.1	Primary Assembly	7	65380470	40.5	CP068271.2	Chromosome		NC_060931.1	assembled-molecule	160567428	chr7		7
+GCF_009914755.1	Primary Assembly	8	58844810	40	CP068270.2	Chromosome		NC_060932.1	assembled-molecule	146259331	chr8		8
+GCF_009914755.1	Primary Assembly	9	62274326	41.5	CP068269.2	Chromosome		NC_060933.1	assembled-molecule	150617247	chr9		9
+GCF_009914755.1	Primary Assembly	10	55977175	41.5	CP068268.2	Chromosome		NC_060934.1	assembled-molecule	134758134	chr10		10
+GCF_009914755.1	Primary Assembly	11	56149738	41.5	CP068267.2	Chromosome		NC_060935.1	assembled-molecule	135127769	chr11		11
+GCF_009914755.1	Primary Assembly	12	54362548	41	CP068266.2	Chromosome		NC_060936.1	assembled-molecule	133324548	chr12		12
+GCF_009914755.1	Primary Assembly	13	43519327	38.5	CP068265.2	Chromosome		NC_060937.1	assembled-molecule	113566686	chr13		13
+GCF_009914755.1	Primary Assembly	14	41544006	41	CP068264.2	Chromosome		NC_060938.1	assembled-molecule	101161492	chr14		14
+GCF_009914755.1	Primary Assembly	15	42011882	42	CP068263.2	Chromosome		NC_060939.1	assembled-molecule	99753195	chr15		15
+GCF_009914755.1	Primary Assembly	16	41935630	43.5	CP068262.2	Chromosome		NC_060940.1	assembled-molecule	96330374	chr16		16
+GCF_009914755.1	Primary Assembly	17	38163861	45.5	CP068261.2	Chromosome		NC_060941.1	assembled-molecule	84276897	chr17		17
+GCF_009914755.1	Primary Assembly	18	32056601	40	CP068260.2	Chromosome		NC_060942.1	assembled-molecule	80542538	chr18		18
+GCF_009914755.1	Primary Assembly	19	29411011	47.5	CP068259.2	Chromosome		NC_060943.1	assembled-molecule	61707364	chr19		19
+GCF_009914755.1	Primary Assembly	20	28945961	43.5	CP068258.2	Chromosome		NC_060944.1	assembled-molecule	66210255	chr20		20
+GCF_009914755.1	Primary Assembly	21	18778084	41.5	CP068257.2	Chromosome		NC_060945.1	assembled-molecule	45090682	chr21		21
+GCF_009914755.1	Primary Assembly	22	23532007	46	CP068256.2	Chromosome		NC_060946.1	assembled-molecule	51324926	chr22		22
+GCF_009914755.1	Primary Assembly	X	60948906	39.5	CP068255.2	Chromosome		NC_060947.1	assembled-molecule	154259566	chrX		X
+GCF_009914755.1	Primary Assembly	Y	22576417	36	CP086569.2	Chromosome		NC_060948.1	assembled-molecule	62460029	chrY		Y

@@ -1,0 +1,28 @@
+Assembly Accession	Assembly-unit accession	Chromosome name	GC Count	GC Percent	GenBank seq accession	Molecule type	Ordering	RefSeq seq accession	Role	Seq length	UCSC style name	Unlocalized Count	Sequence name
+GCF_028878055.3	Primary Assembly	1	68660430	41	CM054509.2	Chromosome		NC_072423.2	assembled-molecule	167654734			chr1_hap1
+GCF_028878055.3	Primary Assembly	2	61387908	40	CM054510.2	Chromosome		NC_072424.2	assembled-molecule	154079787			chr2_hap1
+GCF_028878055.3	Primary Assembly	3	65231642	41	CM054511.2	Chromosome		NC_072425.2	assembled-molecule	160054556			chr3_hap1
+GCF_028878055.3	Primary Assembly	4	64621269	38.5	CM054512.2	Chromosome		NC_072426.2	assembled-molecule	167252203			chr4_hap1
+GCF_028878055.3	Primary Assembly	5	66583910	41	CM054513.2	Chromosome		NC_072427.2	assembled-molecule	161705797			chr5_hap1
+GCF_028878055.3	Primary Assembly	6	61505193	39.5	CM054514.2	Chromosome		NC_072428.2	assembled-molecule	154842609			chr6_hap1
+GCF_028878055.3	Primary Assembly	7	61901290	40	CM054515.2	Chromosome		NC_072429.2	assembled-molecule	154492986			chr7_hap1
+GCF_028878055.3	Primary Assembly	8	62289875	40.5	CM054516.2	Chromosome		NC_072430.2	assembled-molecule	153293009			chr8_hap1
+GCF_028878055.3	Primary Assembly	9	59214471	40	CM054517.2	Chromosome		NC_072431.2	assembled-molecule	147755551			chr9_hap1
+GCF_028878055.3	Primary Assembly	10	55912289	39.5	CM054518.2	Chromosome		NC_072432.2	assembled-molecule	141396425			chr10_hap1
+GCF_028878055.3	Primary Assembly	11	57648509	40.5	CM054519.2	Chromosome		NC_072433.2	assembled-molecule	142585216			chr11_hap1
+GCF_028878055.3	Primary Assembly	12	58160187	39.5	CM054527.2	Chromosome		NC_072441.2	assembled-molecule	146713733			chr19_hap1
+GCF_028878055.3	Primary Assembly	13	57188871	42	CM054521.2	Chromosome		NC_072435.2	assembled-molecule	136159655			chr13_hap1
+GCF_028878055.3	Primary Assembly	14	52592671	42	CM054522.2	Chromosome		NC_072436.2	assembled-molecule	124962429			chr14_hap1
+GCF_028878055.3	Primary Assembly	15	45928208	38	CM054523.2	Chromosome		NC_072437.2	assembled-molecule	120311650			chr15_hap1
+GCF_028878055.3	Primary Assembly	16	43779410	39.5	CM054524.2	Chromosome		NC_072438.2	assembled-molecule	111298303			chr16_hap1
+GCF_028878055.3	Primary Assembly	17	43075777	40.5	CM054525.2	Chromosome		NC_072439.2	assembled-molecule	106261908			chr17_hap1
+GCF_028878055.3	Primary Assembly	18	48026426	43	CM054526.2	Chromosome		NC_072440.2	assembled-molecule	111959805			chr18_hap1
+GCF_028878055.3	Primary Assembly	19	39265307	40	CM054520.2	Chromosome		NC_072434.2	assembled-molecule	98029838			chr12_hap1
+GCF_028878055.3	Primary Assembly	20	31671262	43.5	CM054528.2	Chromosome		NC_072442.2	assembled-molecule	72981805			chr20_hap1
+GCF_028878055.3	Primary Assembly	21	37044658	39.5	CM054529.2	Chromosome		NC_072443.2	assembled-molecule	95096135			chr21_hap1
+GCF_028878055.3	Primary Assembly	22	34642955	43	CM054530.2	Chromosome		NC_072444.2	assembled-molecule	80751072			chr22_hap1
+GCF_028878055.3	Primary Assembly	23	31693649	40.5	CM054531.2	Chromosome		NC_072445.2	assembled-molecule	78312223			chr23_hap1
+GCF_028878055.3	Primary Assembly	24	33476174	42	CM054532.2	Chromosome		NC_072446.2	assembled-molecule	79424044			chr24_hap1
+GCF_028878055.3	Primary Assembly	X	64932329	39	CM054533.2	Chromosome		NC_072447.2	assembled-molecule	165573899			chrX_hap1
+GCF_028878055.3	Primary Assembly	Y	12078529	40.5	CM054534.2	Chromosome		NC_072448.2	assembled-molecule	29938336			chrY_hap2
+GCF_028878055.3	non-nuclear	MT	7186	43.5	AB504750.1	Mitochondrion		NC_014047.1	assembled-molecule	16516			MT
