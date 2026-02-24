@@ -876,65 +876,6 @@ echo -e "\n Total time taken:" && echo $elapsed_time | awk '{print"-days:",$NF/6
 	done | column -t > gene_length_stats
 
 ####################################################################################################################################################################################################################################################################################################################
-#10. Identify unique SCFRs using PCA
-
-#10.1. Quantification of codon usage patterns and PCA (10.7167 mins)
-
-cd /media/aswin/SCFR/SCFR-main
-start_time=$(date +%s)
-for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
-do
-echo ">"$species
-for win in 5000 7500 10000
-do
-echo " -"$win
-#For SCFRs of atleast a specific length
-mkdir -p PCA/"$species"/"$win"/with_coding_region
-for chr in `cat SCFR_lists/${win}/${species}"_SCFR_atleast_"$win".out" | cut -f 1|sort -u`
-do
-cat SCFR_lists/${win}/${species}"_SCFR_atleast_"$win".out" | awk -v k=$chr '$1==k{print $0}' | sort -k1,1 -k2n,2 | awk '{if($4~"-") print$0,1,"-"; else print$0,1,"+"}' OFS="\t" \
-	| /media/aswin/programs/bedtools2-2.31.1/bin/bedtools getfasta -fi chrs/"$species"/"$chr".fasta -bed stdin -name+ -s > PCA/"$species"/"$win"/with_coding_region/"$chr".fasta
-done
-#For SCFRs of atleast a specific length and with no overlap with coding region
-mkdir -p PCA/"$species"/"$win"/without_coding_region
-for chr in `cat SCFR_lists/${win}/${species}"_SCFR_atleast_"$win"_in_non_coding.bed" | cut -f 1|sort -u`
-do
-cat SCFR_lists/${win}/${species}"_SCFR_atleast_"$win"_in_non_coding.bed" | awk -v k=$chr '$1==k{print $0}' | sort -k1,1 -k2n,2 | awk '{if($4~"-") print$0,"-"; else print$0,"+"}' OFS="\t" \
-	| /media/aswin/programs/bedtools2-2.31.1/bin/bedtools getfasta -fi chrs/"$species"/"$chr".fasta -bed stdin -name+ -s > PCA/"$species"/"$win"/without_coding_region/"$chr".fasta
-done
-#Calculate codon metrics
-python3 scripts/codon_usage_metrics.py PCA/${species}/${win}/with_coding_region PCA/${species}/${win}/with_coding_region
-python3 scripts/codon_usage_metrics.py PCA/${species}/${win}/without_coding_region PCA/${species}/${win}/without_coding_region
-Rscript scripts/plotPCA.r PCA/"$species"/$win/with_coding_region PCA/"$species"/$win/with_coding_region
-Rscript scripts/plotPCA.r PCA/"$species"/$win/without_coding_region PCA/"$species"/$win/without_coding_region
-done
-done
-end_time=$(date +%s) && elapsed_time=$((end_time - start_time))
-echo -e "\n Total time taken:" && echo $elapsed_time | awk '{print"-days:",$NF/60/60/24,"\n","-hours:",$NF/60/60,"\n","-mins:",$NF/60,"\n","-secs:",$1}' | column -t | sed 's/^/   /g' && echo -e
-
-#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#10.2. For easier visual inspection plot PCA without labels (2.46667 mins)
-
-mkdir /media/aswin/SCFR/SCFR-main/PCA_without_labels
-cd /media/aswin/SCFR/SCFR-main/
-cp -r PCA/* PCA_without_labels/
-find PCA_without_labels/ -name "*.pdf" | xargs rm
-find PCA_without_labels/ -name "*.fasta" | xargs rm
-
-start_time=$(date +%s)
-for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
-	do
-	echo ">"$species
-	for win in 5000 7500 10000
-	do
-	Rscript my_scripts/plotPCA_without_labels.r PCA_without_labels/"$species"/$win/with_coding_region PCA_without_labels/"$species"/$win/with_coding_region
-	Rscript my_scripts/plotPCA_without_labels.r PCA_without_labels/"$species"/$win/without_coding_region PCA_without_labels/"$species"/$win/without_coding_region
-	done
-done
-end_time=$(date +%s) && elapsed_time=$((end_time - start_time))
-echo -e "\n Total time taken:" && echo $elapsed_time | awk '{print"-days:",$NF/60/60/24,"\n","-hours:",$NF/60/60,"\n","-mins:",$NF/60,"\n","-secs:",$1}' | column -t | sed 's/^/   /g' && echo -e
-
-####################################################################################################################################################################################################################################################################################################################
 #11. Discrete Fourier Transform Analysis of SCFR
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1032,7 +973,7 @@ awk '$6~"0.33"' Fourier_analysis/$species/all_length_thresholds_fourier_summary 
 done
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#Plot fourier frequency dendity
+#Plot fourier frequency density
 
 cd /media/aswin/SCFR/SCFR-main
 for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
@@ -1235,29 +1176,7 @@ done | less -SNR
 
 for species in human chimpanzee gorilla bonobo gibbon borangutan sorangutan; do echo ">"$species; awk 'NR>1{print$6}' gene_deserts/SCFR_overlap_gene_deserts/"$species"/SCFR_fasta/nr_blast/"$species"_5000_overlapping_scfrs_canonical_orf_unique.fa.outfmt6.final_list_xp_summary | sort | uniq -c; done | less
 for species in human chimpanzee gorilla bonobo gibbon borangutan sorangutan; do echo ">"$species; awk 'NR>1{print$6}' gene_deserts/SCFR_overlap_gene_deserts/"$species"/SCFR_fasta/nr_blast/"$species"_5000_overlapping_scfrs_canonical_orf_unique.fa.outfmt6.final_list_xp_summary | awk NF | sed 's/uncharacterized_LOC.*/uncharacterized_LOC/g' | sort | uniq -c | sort -k1,1nr ; done | egrep ">|serine"
-trichohyalin-like
-keratin
-endochitinase_2
 
-plectin
-fap1
-dyneinq
-
-
-
-
-
-
-#plot SCFR positional exon shadow (1m47.891s)
-	cd /media/aswin/SCFR/SCFR-main
-	time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
-	do
-	echo ">"$species
-	cd /media/aswin/SCFR/SCFR-main/exon_shadow/"$species"
-	python3 /media/aswin/SCFR/SCFR-main/my_scripts/Figure_3/positional_exon_shadow_in_scfr.py -i "$species"_results.single_exon.txt -t "$species"_positional_single_exon_shadow_in_scfr.csv -p "$species"_positional_single_exon_shadow_in_scfr.pdf -b 20
-	python3 /media/aswin/SCFR/SCFR-main/my_scripts/Figure_3/positional_exon_shadow_in_scfr.py -i "$species"_results.multi_exon.txt -t "$species"_positional_multiple_exon_shadow_in_scfr.csv -p "$species"_positional_multiple_exon_shadow_in_scfr.pdf -b 20
-	cd /media/aswin/SCFR/SCFR-main
-	done
 
 awk '{if($4~"-") print$1,$10,$11,$5"_exitron","1","-"; else print$1,$10,$11,$5"_exitron","1","+"}' OFS="\t" "$species"_results.exitron_candidates.txt | grep -v "#chrom" > "$species"_results.exitron_candidates.bed
 time while read e
@@ -1268,28 +1187,6 @@ fa=$(find /media/aswin/SCFR/SCFR-main/chrs/$species/ -name "$e1*.fasta")
 unset e1 fa
 done < "$species"_results.exitron_candidates.bed > "$species"_results.exitron_candidates.fa
 
-awk 'NR==FNR {a[$1,$2,$3]; next} !(($1,$2,$3) in a)' human_results.single_exon.txt ../human_results.single_exon.txt | awk '{print$0,$3-$2,$6-$5}' | colnum.sh
-awk 'NR==FNR {a[$1,$2,$3]; next} !(($1,$2,$3) in a)' ../human_results.single_exon.txt human_results.single_exon.txt | awk '{print$0,$3-$2,$6-$5}' | colnum.sh
-
-grep TTC23L human_results.multi_exon.txt | grep XM_054351831.1 | less
-
-#Examples of errors on old exon shadow script:
-#1. KLHL17 genes: 1 bp exon is overlapping with SCFR, but reported in new code, this exon is last exon hence if included stop codon then 
-
-https://www.ncbi.nlm.nih.gov/projects/sviewer/?id=NC_060929.1&tkey=DyVtCAAHCwIFDAEOKjseAjhwYm1Ffn5GUm1yWHvsVepD4VLy0QthY3k7ZyV9EQ4hfUU&assm_context=GCF_009914755.1&app_context=genome&mk=35086761:35086777|Shadow|red,35087777:35088032|SCFR|green,35087788:35087862|Shadow|993300,35086759:35086824|SCFR|blue&v=35086498:35087021&c=null&select=null&slim=0
-
-/media/aswin/programs/bedtools2-2.31.1/bin/bedtools getfasta -fi /media/aswin/SCFR/SCFR-main/chrs/human/NC_060929.1.fasta -bed <(echo -e "NC_060929.1\t35086758\t35086824\tSCFR\t1\t+") -name+ -s
-
-
 
 ####################################################################################################################################################################################################################################################################################################################
 ####################################################################################################################################################################################################################################################################################################################
-#Download Repeats
-
-mkdir /media/aswin/SCFR/SCFR-main/Repeats
-wget https://hgdownload.soe.ucsc.edu/hubs/GCA/029/281/585/GCA_029281585.3/GCA_029281585.3.repeatMasker.out.gz
-wget https://hgdownload.soe.ucsc.edu/hubs/GCA/029/281/585/GCA_029281585.3/GCA_029281585.3.repeatModeler.out.gz
-wget https://hgdownload.soe.ucsc.edu/hubs/GCA/029/281/585/GCA_029281585.3/GCA_029281585.3.repeatModeler.families.fa.gz
-
-rm temp_*.csv
-rm tmp.*.fai
