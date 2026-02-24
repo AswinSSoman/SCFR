@@ -18,6 +18,7 @@ Corresponding Author: nagarjun@iiserb.ac.in
       <li> QC: contains genome accessions and genome metadata </li>
       <li> genome_reports: contains chromosome-wise summary data of each species' genome </li>
       <li> genome_sizes: contains data concerning chromosome-wise size in each genome </li>
+      <li> nr_blastp: contains results of running blastp using gene desert derived SCFR-ORFs against nr database </li>      
     </ul>
   </li>
   <li> Scripts: </li>
