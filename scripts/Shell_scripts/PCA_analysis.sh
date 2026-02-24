@@ -304,9 +304,6 @@ echo " -"$lenbin
 cd $lenbin
 len=$(echo $lenbin | sed 's/gt//g')
 #Plor heatmap of codon loadings
-#Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_codon_heatmap.R pca_loadings.tsv "$species"_"$lenbin"_codon_loadings_heatmap.pdf "$species" "$len"
-#Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_codon_heatmap_updated.R pca_loadings.tsv "$species"_"$lenbin"_top_codon_loadings_heatmap.pdf "$species" "$len" 2 5 explained_variance.tsv
-#Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_codon_heatmap_updated.R pca_loadings.tsv "$species"_"$lenbin"_top_codon_loadings_heatmap.pdf "$species" "$len" 5 10  explained_variance.tsv
 Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_codon_contribution_heatmap.R pca_loadings.tsv "$species"_"$lenbin"_top_codon_loadings_heatmap.pdf "$species" "$len" 2 5 explained_variance.tsv
 #Plot variance explained by top 10 PCs
 Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_variance_explained_stat.R explained_variance.tsv "$species"_"$lenbin"_top_10_PC_variance.pdf "$species" "$len"
@@ -405,51 +402,4 @@ Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_codon_contribution_heatm
 cd /media/aswin/SCFR/SCFR-main/
 done
 
-
-
 #######################################################################################################################################################################################################################################################################################################
-#DRAFT
-#######################################################################################################################################################################################################################################################################################################
-
-#copy & collect pdf in one location for slide making
-cd /media/aswin/SCFR/SCFR-main/
-time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
-do
-cd Length_threshold_PCA_kmeans/"$species"
-for lenthr in gt2500 gt5000 gt7500 gt10000
-do
-cd $lenthr
-mkdir -p /media/aswin/SCFR/SCFR-main/shreya/Length_threshold_PCA_kmeans/$species/
-for pdf in $(ls pca_*_PC1_PC2.pdf)
-do
-pc=$(echo $pdf | cut -f3,4 -d "_" | sed 's/\.pdf//g')
-col=$(echo $pdf | cut -f2 -d "_" | sed 's/\.pdf//g')
-cp $pdf /media/aswin/SCFR/SCFR-main/shreya/Length_threshold_PCA_kmeans/$species/"$species"_"$lenthr"_"$pc"_"$col".pdf
-unset pc col
-done
-cp pca_loadings.tsv /media/aswin/SCFR/SCFR-main/shreya/Length_threshold_PCA_kmeans/$species/"$species"_"$lenthr"_pca_loadings.tsv
-cd ../
-done
-unset lenthr
-cd /media/aswin/SCFR/SCFR-main/
-done
-
-
-
-#Code to view the pca codon raw loadings & contribution
-awk '{print $1, $2, $3}' pca_loadings.tsv | awk 'NR==1 {print $0, "Sum_Abs"} NR>1 {abs2=($2<0?-$2:$2); abs3=($3<0?-$3:$3); print $0, abs2+abs3}' | awk 'NR==1 {print $0, "PC1_sq", "PC2_sq"} NR>1 {print $0, $2*$2, $3*$3}' | awk '
-  NR == 1 {header = $0 " Norm_PC1_sq Norm_PC2_sq"; next}
-  {
-    # Store each line in an array and accumulate sums
-    rows[NR] = $0
-    val5[NR] = $5
-    val6[NR] = $6
-    sum5 += $5
-    sum6 += $6}
-  END {print header
-    for (i = 2; i <= NR; i++) {
-      # Divide each stored row by the final sums
-      print rows[i], (val5[i]/sum5)*100, (val6[i]/sum6)*100}}' | column -t
-
-find . -maxdepth 3 -mindepth 3  -name "*.fasta" -type f | xargs -n1 bash -c 'paste <(echo $0 | cut -f4 -d "/") <(grep -v ">" $0 | wc | awk "{print\$3-\$1}")' > total_fasta_length
-
