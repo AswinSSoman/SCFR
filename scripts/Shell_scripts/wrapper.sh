@@ -48,7 +48,7 @@
 	name=$(echo $species | awk '{print$2}')
 	echo ">"$genome $name
 	#Download genome & annotation files
-	#time datasets download genome accession $genome --include genome,gtf,seq-report --filename $genome".zip"
+	time datasets download genome accession $genome --include genome,gtf,seq-report --filename $genome".zip"
 	unzip -o $genome".zip"
 	cd ncbi_dataset/data/$genome
 	#If genome size is too big or the downloads gets failed, use dehydrate
