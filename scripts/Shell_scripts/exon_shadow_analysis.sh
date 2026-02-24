@@ -96,16 +96,6 @@ echo -e "\n Total time taken:" && echo $elapsed_time | awk '{print"-days:",$NF/6
 	awk '$15>0 || $16>0' exon_shadow/"$species"/"$species"_filtered_combined.tsv > exon_shadow/"$species"/"$species"_filtered_combined_non_zero.tsv
 	done
 
-#mkdir -p /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered
-#mkdir -p /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/unfiltered
-#mkdir -p /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered_combined
-#mkdir -p /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered_combined_non_zero
-#mkdir -p /media/aswin/SCFR/SCFR-main/shreya/exitron_filtered
-#find . -mindepth 3 -maxdepth 3 -name "*exon.tsv" -type f | egrep -v "old" | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/unfiltered/'
-#find . -mindepth 3 -maxdepth 3 -name "*filtered.tsv" -type f | egrep -v "old" | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered/'
-#find exon_shadow/ -maxdepth 2 -mindepth 2 -name "*_filtered_combined.tsv" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered_combined/'
-#find exon_shadow/ -maxdepth 2 -mindepth 2 -name "*filtered_combined_non_zero.tsv" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered_combined_non_zero/'
-
 #################################################################################################################################################################################################################################################################################################
 #Plot shadow distriubtion
 
@@ -550,33 +540,4 @@ unset i1 i2 i3 i4
 cd /media/aswin/SCFR/SCFR-main/
 done | sed '1i Species input_count output_count output_with_peaks output_with_3_periodicity' | sed 's/[ ]\+/\t/g' > /media/aswin/SCFR/SCFR-main/exon_shadow/plot/downstream_summary.tsv
 
-#find exon_shadow/ -mindepth 3 -maxdepth 3 -name "*_fourier_fourier_freq.pdf" -type f | xargs -n1 sh -c 'cp $0 shreya/exon_shadow/fourier/'
-
 #################################################################################################################################################################################################################################################################################################
-
-
-#Transfer data
-cd /media/aswin/SCFR/SCFR-main
-mkdir -p shreya/exon_shadow/fourier/exitron
-mkdir -p shreya/exon_shadow/fourier/upstream
-mkdir -p shreya/exon_shadow/fourier/downstream
-time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
-do
-echo $species
-cp exon_shadow/"$species"/composition/exitron_fourier/exitron_with_peaks.tsv shreya/exon_shadow/fourier/exitron/"$species"_exitron_with_peaks.tsv
-cp exon_shadow/"$species"/composition/upstream_fourier/upstream_with_peaks.tsv shreya/exon_shadow/fourier/upstream/"$species"upstream_with_peaks.tsv
-cp exon_shadow/"$species"/composition/downstream_fourier/downstream_with_peaks.tsv shreya/exon_shadow/fourier/downstream/"$species"downstream_with_peaks.tsv
-cp exon_shadow/"$species"/composition/exitron_fourier/3_periodicity_exitron.tsv shreya/exon_shadow/fourier/exitron/"$species"_3_periodicity_exitron.tsv
-cp exon_shadow/"$species"/composition/upstream_fourier/3_periodicity_upstream.tsv shreya/exon_shadow/fourier/upstream/"$species"_3_periodicity_upstream.tsv
-cp exon_shadow/"$species"/composition/downstream_fourier/3_periodicity_downstream.tsv shreya/exon_shadow/fourier/downstream/"$species"_3_periodicity_downstream.tsv
-done
-
-cp exon_shadow/plot/exitron_summary.tsv shreya/exon_shadow/fourier/exitron/
-cp exon_shadow/plot/upstream_summary.tsv shreya/exon_shadow/fourier/upstream/
-cp exon_shadow/plot/downstream_summary.tsv shreya/exon_shadow/fourier/downstream
-
-
-
-
-
-
