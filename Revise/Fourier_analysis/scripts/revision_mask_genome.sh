@@ -163,7 +163,7 @@ NR==FNR {
 }
 ' /media/aswin/SCFR/SCFR-main/Fourier_analysis/human/300/human_scfr_all_atleast_300bp_only_intergenic_unique/chromosome_wise_summary/summary.tsv \
   human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology.bed \
-  > human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_dft_results4.bed
+  > human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_dft_results.bed
 
 
 
