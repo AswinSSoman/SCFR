@@ -300,9 +300,32 @@ Region: NC_060926.1:5042518-5045731
 #Contain only simple repeats : (CTACTA)n
 
 
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#NR blast
+
+#merge SCFRs as many filtered SCFRs are overlapping with short shift in frame
+bedtools merge -i human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene.bed > human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged.bed
+
+mkdir /media/aswin/SCFR/SCFR-main/Fourier_analysis/human/300/nr_blast
+
+#In mopheus
+
+#Install latest blast+
+cd
+wget https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.17.0+-x64-linux.tar.gz
+mkdir -p ~/tools
+tar -xzf ncbi-blast-2.17.0+-x64-linux.tar.gz -C ~/tools/
+
+
+#Download nr database in
+#space required before downloading
+curl -s https://ftp.ncbi.nlm.nih.gov/blast/db/nt-nucl-metadata.json | python3 -m json.tool
+
+mkir ~/blastdb_new/nr
+cd ~/blastdb_new/nr
+nohup ~/blastdb_new/nr/download_nr.sh > ~/blastdb_new/nr/nr_download.log 2>&1 &
 
 
 
-SCFR_NC_060935_1_206502_214065_frame1_fft
 
 
