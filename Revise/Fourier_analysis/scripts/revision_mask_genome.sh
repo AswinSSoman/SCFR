@@ -177,6 +177,8 @@ awk -F "\t" '{print$3-$2}' human_scfr_all_atleast_300bp_only_intergenic_unique_w
 #sort based on length
 awk -F "\t" 'BEGIN{OFS="\t"} {print ($3 - $2), $0}' human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.3_dft_results.bed | sort -k1,1nr | cut -f2- > length_sorted_human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.3_dft_results.bed
 
+python3 scfr_report.py your_scfr.bed -o scfr_report.html --fai genome.fa.fai --cytoband cytoBandIdeo.txt --main-only
+
 #Add header
 sed -i '1i Chr Start End Frame_strand Filler Strand SCFR_Name Num_Raw_Peaks Top_Peak_Count Frequencies Magnitudes Periods' length_sorted_human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.3_dft_results.bed 
 #make tab separated
@@ -307,25 +309,77 @@ Region: NC_060926.1:5042518-5045731
 bedtools merge -i human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene.bed > human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged.bed
 
 mkdir /media/aswin/SCFR/SCFR-main/Fourier_analysis/human/300/nr_blast
+mv human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged.bed nr_blast/
+#Get fasta
+cd nr_blast/
+bedtools getfasta -fi /media/aswin/SCFR/SCFR-main/genomes/human/GCA_009914755.4_T2T-CHM13v2.0_genomic.fna -bed human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged.bed -name+ > human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged.fa
+
 
 #In mopheus
 
 #Install latest blast+
-cd
-wget https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.17.0+-x64-linux.tar.gz
-mkdir -p ~/tools
-tar -xzf ncbi-blast-2.17.0+-x64-linux.tar.gz -C ~/tools/
-
+	cd
+	wget https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.17.0+-x64-linux.tar.gz
+	mkdir -p ~/tools
+	tar -xzf ncbi-blast-2.17.0+-x64-linux.tar.gz -C ~/tools/
 
 #Download nr database in
-#space required before downloading
-curl -s https://ftp.ncbi.nlm.nih.gov/blast/db/nt-nucl-metadata.json | python3 -m json.tool
+	#space required before downloading
+	mkir ~/blastdb_new/nr
+	cd ~/blastdb_new/nr
+	curl -s https://ftp.ncbi.nlm.nih.gov/blast/db/nt-nucl-metadata.json | python3 -m json.tool
+	#315m0.730s
+	nohup ~/blastdb_new/nr/download_nr.sh > ~/blastdb_new/nr/nr_download.log 2>&1 &
 
-mkir ~/blastdb_new/nr
-cd ~/blastdb_new/nr
-nohup ~/blastdb_new/nr/download_nr.sh > ~/blastdb_new/nr/nr_download.log 2>&1 &
+#Prepare inputs
+	mkdir -p ~/aswin/SCFR/Fourier_analysis/nr_blast
+	cd ~/aswin/SCFR/Fourier_analysis/nr_blast
+	scp ceglab25@172.28.65.125:/media/aswin/SCFR/SCFR-main/Fourier_analysis/human/300/nr_blast/human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged.* .
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#RUN BLAST
+
+#Primary test — translated nucleotide vs protein database:
+	#tblastn is for protein query vs translated nt — you want the reverse: nucleotide query, 6-frame translated, vs protein db. That's blastx.
+	#Use nr (protein), not nt, as the database here — this is the actual test the field uses for "no homology to known coding genes."
+	#E-value 1e-3, not the usual 1e-5/1e-10 — you're doing exclusion, not discovery, so you want to be lenient about what counts as a hit. A borderline hit here is a reason to flag/exclude a candidate, not something you want to miss by being too strict. Err toward sensitivity.
+	#-seg yes masks low-complexity regions, important since your regions may have compositional bias that could create spurious hits.
+
+
+nohup bash -c 'time /home/morpheus/tools/ncbi-blast-2.17.0+/bin/blastx \
+ -query human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged.fa \
+ -db /home/morpheus/blastdb_new/nr/nr \
+ -out human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx.tsv \
+ -outfmt "6 qseqid sseqid qlen length qstart qend evalue bitscore score qcovs qcovhsp pident nident mismatch gaps sstrand" \
+ -evalue 1e-3 \
+ -num_threads 56 \
+ -max_target_seqs 10 \
+ -seg yes' &> stdout_blastx_run.out &
+
+Query	Subject	Query_length	Alignment_length	Q_start	Q_end	E_value	Bit_score	Raw_score	%_Query_covered_per_sub	%_Query_covered_per_hsp	%_ident	Matches	Mismatches	Gaps	Strand
+
+
+#Secondary test — nucleotide vs nt (catches RNA genes, pseudogenes, recent duplicates that blastx might miss if there's no ORF-preserving frame):
+blastn -query all_559.fasta -db nt -out results_blastn.tsv -outfmt 6 -evalue 1e-3 -num_threads 72 -max_target_seqs 10
+
+
+cd ~/aswin/SCFR/Fourier_analysis/nr_blast
+head human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx.tsv | sed '1i Query Subject Query_length Alignment_length Q_start Q_end E_value Bit_score Raw_score %_Query_covered_per_sub %_Query_covered_per_hsp %_ident Matches Mismatches Gaps Strand' | column -t
+transeq -frame 6 --auto --stdout \
+
+transeq --frame 6 --auto --stdout <(bedtools getfasta -fi GCA_009914755.4_T2T-CHM13v2.0_genomic.fna -bed <(grep XP_055898630.1 human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx.tsv | grep 1878 | awk '{print$1,$5,$6}'| sed 's/^:://g' | tr ":-" "\t" | awk '{print$1,$2+$5, $2+$4}' OFS="\t") -name+) | sed '/^>/! s/.*/\U&/' | ~/aswin/programmes/myfasta -comb | egrep "GLTAALHRVPIASASPHGVPIASASPHGVPIASASPHGVPIASASPHGVPIASATPHGVP|VASASPHGVPVASASPHGVPVASASPHGVPVASASPHGVPVASASPHGVPVASATPHGVPVASATPHGVPVAS" -z
+
+grep XP_055898630.1 human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx.tsv | grep 1809 | ./check_scfr_fasta.sh  | egrep "ASPHGVPVASASPHGVPVASASPHGVPVASATPHGVPVASATPHGVPVASQ|ASPHGVPIASASPHGVPIASASPHGVPIASATPHGVPIASASPHGVPIASATPHGVPIAS" -z
 
 
 
+
+
+
+#scp /media/aswin/SCFR/SCFR-main/genomes/human/GCA_009914755.4_T2T-CHM13v2.0_genomic.fna morpheus@172.30.1.121:~/aswin/SCFR/Fourier_analysis/nr_blast/
+
+blastn -query all_559.fasta -db nt -out results.tsv -outfmt 6 -evalue 1e-10 -num_threads 16 -max_target_seqs 5
+blastn_new -query all_559.fasta -out results.tsv -outfmt 6 -evalue 1e-10 -num_threads 72
+blastx -query all_559.fasta -db nr -out results_blastx.tsv -outfmt 6 -evalue 1e-3 -num_threads 72 -max_target_seqs 10 -seg yes
 
 
