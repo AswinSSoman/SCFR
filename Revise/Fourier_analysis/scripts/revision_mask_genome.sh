@@ -237,6 +237,11 @@ awk -F "\t" 'FNR==NR {map[$1]=$2; next} $1 in map {$1=map[$1]} 1' OFS="\t" refse
 #scp Repetitive_Elements.bed ceglab8@172.28.65.118:~/Downloads/SCFR/
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Download RNA-seq track data from UCSC
+
+wget https://hgdownload.soe.ucsc.edu/gbdb/hs1/bbi/xenoRefGene.bb
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 #Some borderline cases occurs i.e. some SCFRs sometimes overlaps with both intergenic & genic features. But since the overlap length with intergenic reigion is >300bp these would be saved inside "human_scfr_all_atleast_300bp_only_intergenic_unique.bed"
 #Partially these SCFRs overlap with genic regions, importantly CDS, which contributes to it's 0.33 DFT frequency, hence these can't be proto-genes & must be removed
@@ -345,7 +350,7 @@ bedtools getfasta -fi /media/aswin/SCFR/SCFR-main/genomes/human/GCA_009914755.4_
 	#E-value 1e-3, not the usual 1e-5/1e-10 — you're doing exclusion, not discovery, so you want to be lenient about what counts as a hit. A borderline hit here is a reason to flag/exclude a candidate, not something you want to miss by being too strict. Err toward sensitivity.
 	#-seg yes masks low-complexity regions, important since your regions may have compositional bias that could create spurious hits.
 
-
+#1482m47.609s
 nohup bash -c 'time /home/morpheus/tools/ncbi-blast-2.17.0+/bin/blastx \
  -query human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged.fa \
  -db /home/morpheus/blastdb_new/nr/nr \
@@ -356,24 +361,74 @@ nohup bash -c 'time /home/morpheus/tools/ncbi-blast-2.17.0+/bin/blastx \
  -max_target_seqs 10 \
  -seg yes' &> stdout_blastx_run.out &
 
-Query	Subject	Query_length	Alignment_length	Q_start	Q_end	E_value	Bit_score	Raw_score	%_Query_covered_per_sub	%_Query_covered_per_hsp	%_ident	Matches	Mismatches	Gaps	Strand
-
-
-#Secondary test — nucleotide vs nt (catches RNA genes, pseudogenes, recent duplicates that blastx might miss if there's no ORF-preserving frame):
-blastn -query all_559.fasta -db nt -out results_blastn.tsv -outfmt 6 -evalue 1e-3 -num_threads 72 -max_target_seqs 10
-
-
+#Ispect the blast hits
 cd ~/aswin/SCFR/Fourier_analysis/nr_blast
-head human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx.tsv | sed '1i Query Subject Query_length Alignment_length Q_start Q_end E_value Bit_score Raw_score %_Query_covered_per_sub %_Query_covered_per_hsp %_ident Matches Mismatches Gaps Strand' | column -t
+#Quick view blast results with header names
+head human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx.tsv | sed '1i Query Subject Query_Nt_length Alignment_Aa_length Q_Nt_start Q_Nt_end E_value Bit_score Raw_score %_Query_covered_per_sub %_Query_covered_per_hsp %_ident Matches Mismatches Gaps Strand' | column -t
 transeq -frame 6 --auto --stdout \
-
+#Cross check individually if SCFR sequence gives same hits using ncbi website blastx & matching exact sequence co-ordinate with local bed file 
 transeq --frame 6 --auto --stdout <(bedtools getfasta -fi GCA_009914755.4_T2T-CHM13v2.0_genomic.fna -bed <(grep XP_055898630.1 human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx.tsv | grep 1878 | awk '{print$1,$5,$6}'| sed 's/^:://g' | tr ":-" "\t" | awk '{print$1,$2+$5, $2+$4}' OFS="\t") -name+) | sed '/^>/! s/.*/\U&/' | ~/aswin/programmes/myfasta -comb | egrep "GLTAALHRVPIASASPHGVPIASASPHGVPIASASPHGVPIASASPHGVPIASATPHGVP|VASASPHGVPVASASPHGVPVASASPHGVPVASASPHGVPVASASPHGVPVASATPHGVPVASATPHGVPVAS" -z
-
 grep XP_055898630.1 human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx.tsv | grep 1809 | ./check_scfr_fasta.sh  | egrep "ASPHGVPVASASPHGVPVASASPHGVPVASATPHGVPVASATPHGVPVASQ|ASPHGVPIASASPHGVPIASASPHGVPIASATPHGVPIASASPHGVPIASATPHGVPIAS" -z
 
+#Convert blastx hits to genomic bed
+awk '{
+    sub(/^::/, "", $1)
+    gsub(/[:-]/, " ", $1)
+    split($1, a)
+    print a[1] "\t" a[2] "\t" a[3] "\tSub:" $2 ",Len:" $4 ",Qcov:" $11 ",%id:" $12 ",Eval:" $7
+}' human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx.tsv > human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_hits.bed
 
+#More cincise table of blastx hits (one subject hit at same location is shown only once)
+awk '
+{
+    # 1. Parse chromosome, start, and end from $1
+    sub(/^::/, "", $1)
+    gsub(/[:-]/, " ", $1)
+    split($1, a)
+    chr = a[1]; start = a[2]; end = a[3]
 
+    # 2. Extract values needed for key, evalue, and output formatting
+    sub_id = $2
+    len    = $4
+    qcov   = $11
+    pid    = $12
+    evalue = $7 + 0  # Cast to numeric float for scientific notation comparison
 
+    # 3. Create unique group key (cols 1, 2, 3, and 4)
+    key = chr "\t" start "\t" end "\tSub:" sub_id
+
+    # 4. Count total occurrences for this group key
+    count[key]++
+
+    # 5. Store/update record if key is new OR if a lower E-value is found
+    if (!(key in min_eval) || evalue < min_eval[key]) {
+        min_eval[key] = evalue
+        best_row[key] = chr "\t" start "\t" end "\tSub:" sub_id \
+                        ",Len:" len ",Qcov:" qcov ",%id:" pid ",Eval:" $7
+    }
+}
+END {
+    # Print the best row for each key along with the total hit count appended
+    for (k in best_row) {
+        print best_row[k] "\tHits:" count[k]
+    }
+}' human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx.tsv > human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_hits.bed
+
+sort -u human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_hits.bed > human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_hits_unique.bed
+
+#scp human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_hits.bed human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_and_nrblastx_hits.bed ceglab8@172.28.65.118:~/Downloads/SCFR
+#scp human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx.tsv  human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_hits.bed stdout_blastx_run.out ceglab25@172.28.65.125:/media/aswin/SCFR/SCFR-main/Fourier_analysis/human/300/nr_blast/
+
+#In ceglab25
+cd /media/aswin/SCFR/SCFR-main/Fourier_analysis/human/300
+bedtools intersect -a human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene.bed -b nr_blast/human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_hits.bed | wc -l
+bedtools intersect -a human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene.bed -b nr_blast/human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_hits.bed -v > human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_and_nrblastx_hits.bed
+
+awk -F "\t" 'BEGIN{OFS="\t"} {print ($3 - $2), $0}' human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.3_dft_results.bed | sort -k1,1nr | cut -f2- > length_sorted_human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.3_dft_results.bed
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Secondary test — nucleotide vs nt (catches RNA genes, pseudogenes, recent duplicates that blastx might miss if there's no ORF-preserving frame):
+blastn -query all_559.fasta -db nt -out results_blastn.tsv -outfmt 6 -evalue 1e-3 -num_threads 72 -max_target_seqs 10
 
 
 #scp /media/aswin/SCFR/SCFR-main/genomes/human/GCA_009914755.4_T2T-CHM13v2.0_genomic.fna morpheus@172.30.1.121:~/aswin/SCFR/Fourier_analysis/nr_blast/
