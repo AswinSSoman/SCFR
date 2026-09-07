@@ -140,6 +140,7 @@ time bedtools intersect -a $xscfr"_atleast_300bp.bed" -b final_gtf_features/only
 time bedtools intersect -a $xscfr"_atleast_300bp.bed" -b final_gtf_features/genes.bed -wao | awk '$NF>299' | awk -F "\t" '$6!=$12' | awk '{print$0,($17/($3-$2))*100}' OFS="\t" >  $xscfr"_atleast_300bp_antisense_intergenic.bed"
 
 ######################################################################################################################################################################################################################################################################################################
+#RUN DFT 
 
 #create conda environment
 #conda create -n scfr python=3.10 numpy scipy biopython matplotlib tqdm pandas -y
@@ -178,7 +179,7 @@ cd /media/aswin/SCFR/SCFR-main
 done
 
 ######################################################################################################################################################################################################################################################################################################
-#Collect all figures
+#Collect all summary DFT frequency figures
 
 mkdir /media/aswin/SCFR/SCFR-main/Fourier_analysis/collect_figures
 cd /media/aswin/SCFR/SCFR-main/Fourier_analysis/collect_figures
