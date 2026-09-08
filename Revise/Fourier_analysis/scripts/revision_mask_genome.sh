@@ -1,6 +1,62 @@
 ######################################################################################################################################################################################################################################################################################################
-#																																																																																																																																				Idenitfy Proto-genes
+#																																																																																																																																				Idenitfy Proto-genes in human T2T genome
 ######################################################################################################################################################################################################################################################################################################
+
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Background:
+
+	#The Stop Codon Free Regions (SCFRs) were used as candidates for finding proto-genes by scanning both DNA strands of a given genome assembly in all six possible reading frames. 
+	#Briefly I identified contiguous regions that do not contain any in-frame stop codons. The shortest detectable SCFR is 3bp.
+	#Because these assemblies are gapless, they provide a remarkable view of genomic regions which were previously inaccessible.
+	#Now I wanted to use a different method to find composition characteristics, such as Discrete fourier transform for finding periodicity in these regions. 
+	#Fourier analysis is appropriate for this purpose because repeating biological patterns of any kind manifest as distinct frequencies whose strengths can be quantitatively evaluated.
+	#DFT transforms a nucleotide sequence into a spectrum, where “frequency” denotes how often a specific pattern recurs along the sequence, and “amplitude” measures the intensity of that repeating signal within the nucleotide arrangement.
+	#A frequency of 0.33 represents periodicity of 3 representing codon-level periodicity.
+	#Even if the do novo proto-genes are radically different from existing genes lacking homology and show distinct GC content, the periodicity will remain if their proteins are getting selected showing coding constraints.
+	#My hypothesis is that there could even be a spectrum of periodicity for a collection of SCFRs converging towards the periodicity 3 indicating a bunch of sequences are at different stages of de novo gene birth.
+	#The mains steps are aquiring ability to transcribe (for e.g. using transposable elements) and then ability to translate (by getting long enough ORF).
+	#Only when it gets transcribed, it gets exposed to natural selection.
+	#Once it gets translated as well, the selection starts putting coding contraints such as maintaining triplets & frame.
+	#Even after becoming proto-gene, it continously gets mutated to get features such as longer, stably regulated protein. This might reflect in the DFT frequency.
+	#If the frequency shows a spectrum then it could support the proto-gene model which says the process of de novo gene birth isn’t a 2 stage process, instead a spectrum from non-genic to gene status.
+
+#I estimated DFT frequency & amplitude of all SCFR's above 300bp (usually 100 aa is considered a widely used threshold for short de novo protein) in the human T2T genome.
+#I then classified these >=300bp SCFRs into different classes based on it's overlap with genomic features. There were mainly 7 classes:
+#CDS, intron, UTR, RNA genes, pseudogenes, Intergenic regions, antisense intergenic regions (antisense strand of coding strand is considered intergenic in a way, but not purely intergenic)
+
+#I made 2 types of plots for each 6 SCFR classes:
+	#1. Frequency density plot (X = DFT frequency 0–0.5, Y = density)
+	#2. Frequency–amplitude–count heatmap (X = frequency bin, Y = amplitude bin, color = number of SCFRs in that bin)
+
+#Across 7 primate species checked following observations observed:
+	#1. CDS & pseudogenes    : shows 0.33 as very sharp peak wither no other peak or very short 2ry peak.
+	#2. intergenic           : 2 sharp peaks at 0.20 & 0.40, both has same density. might represent 5bp periodic repeat.
+		                       #This is the expected outcome for bulk intergenic DNA, which genome-wide is dominated by simple tandem repeats, satellite DNA, and transposable-element-derived repeats with strong internal short-period structure — not by protein-coding constraint.
+	#3. Antisense intergenic : This is the broadest, flattest, most multi-modal category in the dataset — peak heights are only ≈3–7 (versus ≈20 for CDS and intergenic), and every panel shows 3–4 separate bumps rather than one or two clean peaks. 
+		                       #Six of seven species (all but human) have their single tallest peak at 0.333–0.334 — the codon position — while human's tallest peak sits at 0.20 instead, more like bulk intergenic DNA.
+		                       #The much lower absolute peak heights than CDS confirm the signal is real but far weaker/less universal than true coding sequence: 
+		                       		#Only a sub-population of this pool carries strong 0.333 periodicity, while the rest contributes the broad, low background and the low- and high-frequency side bumps.
+		                       		
+	#4. Introns              : The broadest and flattest density curves of any category (peak heights only ≈1–5, roughly a quarter of CDS/intergenic) — consistent with introns being the single least compositionally constrained category tested.
+		                       #All six non-human apes share a near-zero dominant peak (0.02–0.023, a slowly-varying compositional trend, not a short repeat),
+		                       #The near-zero dominant peak reflects the well-established fact that introns are the least sequence-constrained of the transcribed categories, but not compared to intergenic.
+	#5. UTR                  : 2 peaks. at 0.33 and 0.016. In humans both peaks have same density, in others 0.13-0.16 is dominant peak. with 0.33 is smaller peak.
+		                       #UTRs are transcribed but (mostly) not translated, so the presence of any 0.33 signal at all is attributable to a minority of upstream/downstream ORF-adjacent sequence or short upstream ORFs (uORFs) known to occur in many UTRs
+		                       #This sits on top of a majority background of non-coding, compositionally drifting sequence (the near-zero peak).
+	#6. RNA genes            : This is the least consistent category in the entire dataset — every single species shows a different dominant frequency (0.02, 0.16, 0.20, 0.336, 0.474 are all seen as someone's Peak1).
+		                       #Peak dominance is uniformly weak (Peak diff mostly <1, versus >18 for CDS) — i.e., no species shows one periodicity clearly winning out over the others.
+		                       #"RNA genes" is the most compositionally heterogeneous category by definition — it lumps together rRNA, tRNA, snRNA, snoRNA, miRNA host sequence, and long non-coding RNA (lncRNA) loci, which have very different base-composition and repeat profiles from one another.
+		                       #Also the pooled density estimate here is expected to be noisier and more sensitive to whichever few sub-types of RNA gene happen to be well-represented in that species' annotation.
+		                       #Long non-coding RNAs are exactly the substrate the "already transcribed, not yet translated" stage of your model describes, and a growing literature documents lncRNA loci that harbor short, translated open reading frames (micropeptides) under weak-to-moderate selection.
+		                       #The orangutan and B. orangutan 0.336 dominant peaks in this category are consistent with (but not proof of) a sub-population of RNA-gene-overlapping SCFRs acquiring codon periodicity — i.e., candidate proto-genes hiding inside currently-annotated non-coding RNA loci.
+                        
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Purpose of this code:
+
+
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ######################################################################################################################################################################################################################################################################################################
 #Prepare inputs
@@ -448,8 +504,7 @@ END {
     }
 }' human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx.tsv > human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_unique_hits.bed
 
-sort -u human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_unique_hits.bed > human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_hits_unique.bed
-
+#transfer blastx outputs
 scp check_scfr_fasta.sh \
 human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx.tsv \
 human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_all_hits.bed \
@@ -459,12 +514,21 @@ scp human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.
 human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_all_hits.bed \
 human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_unique_hits.bed ceglab8@172.28.65.118:~/Downloads/SCFR
 
-#scp human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx.tsv  human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_hits.bed stdout_blastx_run.out ceglab25@172.28.65.125:/media/aswin/SCFR/SCFR-main/Fourier_analysis/human/300/nr_blast/
-
 #In ceglab25
 cd /media/aswin/SCFR/SCFR-main/Fourier_analysis/human/300
-bedtools intersect -a human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene.bed -b nr_blast/human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_hits.bed | wc -l
-bedtools intersect -a human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene.bed -b nr_blast/human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_hits.bed -v > human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_and_nrblastx_hits.bed
+#Overlapping SCFR count
+bedtools intersect -u \
+-a  human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene.bed \
+-b nr_blast/human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_unique_hits.bed | wc -l
+#Non-overlapping SCFR count
+bedtools intersect \
+-a human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene.bed \
+-b nr_blast/human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_unique_hits.bed -v| wc -l
+
+#Get SCFRs not overlapping
+bedtools intersect \
+-a human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene.bed \
+-b nr_blast/human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_unique_hits.bed -v > human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_and_nrblastx_hits.bed
 
 mkdir /media/aswin/SCFR/SCFR-main/Fourier_analysis/human/300/filtering_intergenic_SCFR
 cp human_scfr_all_atleast_300bp_only_intergenic_unique.bed \
@@ -472,9 +536,29 @@ human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology.bed \
 human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_dft_results.bed \
 human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results.bed \
 human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene.bed \
-human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_and_nrblastx_hits.bed \
-nr_blast/human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged.bed filtering_intergenic_SCFR/
+nr_blast/human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged.bed \
+nr_blast/human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_all_hits.bed \
+nr_blast/human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_unique_hits.bed \
+human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_and_nrblastx_hits.bed  filtering_intergenic_SCFR/
 
+
+#filtered scfrs overlapping repeats
+bedtools intersect \
+  -a human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_and_nrblastx_hits.bed \
+  -b <(awk '$1 != "chrM"' Repetitive_Elements.bed) \
+  -v | wc -l
+
+bedtools intersect \
+  -wa -wb \
+  -a human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_and_nrblastx_hits.bed \
+  -b <(awk '$1 != "chrM"' Repetitive_Elements.bed) > human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_and_nrblastx_hits_overlapping_repeats.bed  
+
+#Check the type of repeats that overlap filtered SCFRs
+sed 's/ /_/g' human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_and_nrblastx_hits_overlapping_repeats.bed | awk '{print$16}' | awk -F "#" '{print$2,$1}' OFS="\t" | tr " " "_" | sort -k1V,1 | awk '{print$1}' | sort | uniq -c | sort -k1nr,1
+sed 's/ /_/g' human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_and_nrblastx_hits_overlapping_repeats.bed | awk '{print$16}' | awk -F "#" '{print$2,$1}' OFS="\t" | tr " " "_" | sort -k1V,1 | grep Simple_repeat | awk '{print$2}' | sed 's/^(//g' | sed 's/)n//g' | awk '{print length}' | ./term_hist2.py -s 0.1
+#Simple repeats that are not multiple of 3
+sed 's/ /_/g' human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_and_nrblastx_hits_overlapping_repeats.bed | awk '{print$16}' | awk -F "#" '{print$2,$1}' OFS="\t" | tr " " "_" | sort -k1V,1 | grep Simple_repeat | awk '{print$2}' | sed 's/^(//g' | sed 's/)n//g' | awk 'length($1) % 3 != 0 {print $0, length($1)}'
+  
 awk -F "\t" 'BEGIN{OFS="\t"} {print ($3 - $2), $0}' human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.3_dft_results.bed | sort -k1,1nr | cut -f2- > length_sorted_human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.3_dft_results.bed
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
