@@ -302,7 +302,7 @@ awk -F "\t" 'BEGIN{OFS="\t"} {print ($3 - $2), $0}' human_scfr_all_atleast_300bp
 #scp human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene.bed ceglab8@172.28.65.118:~/Downloads/SCFR/
 
 ######################################################################################################################################################################################################################################################################################################
-#NR blast
+#BLAST AGAINST DATABASES OF EXISTING PROTEINS/GENES
 
 #merge SCFRs as many filtered SCFRs are overlapping with short shift in frame
 bedtools merge -i human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene.bed > human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged.bed
@@ -313,8 +313,42 @@ mv human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.3
 cd nr_blast/
 bedtools getfasta -fi /media/aswin/SCFR/SCFR-main/genomes/human/GCA_009914755.4_T2T-CHM13v2.0_genomic.fna -bed human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged.bed -name+ > human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged.fa
 
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Strategy:
+
+
+#NCBI has mainly 2 databases which serve as  ultimate, all-inclusive catch-all archives [1, 2] of public sequence data:
+	#1. nr (non-redundant protein): Stores translated amino acid sequences from GenBank, RefSeq, UniProt, and other archives.
+	#2. nt (non-redundant nucleotide): Stores DNA and RNA nucleic acid sequences.
+
+#The core message is: To prove a gene is truly brand new (de novo), you must prove it has absolutely no ancestral relatives. Searching the protein database (nr) is a much harsher, more decisive test for this than searching the nucleotide database (nt).
+------------------------------
+## 1. The Core Problem: Why Nucleotide Search (nt) Fails for De Novo Genes
+	#* DNA changes too fast: DNA sequences mutate rapidly. Due to codon degeneracy (different DNA triplets coding for the exact same amino acid), two genes can look completely different at the DNA level but still produce the exact same protein.
+	#* The "False De Novo" Trap: If an ancient gene mutates heavily at the DNA level, a blastn search against nt will find zero matches. You might falsely celebrate thinking you found a brand-new de novo gene. However, it’s actually just a fast-evolving remnant of an old gene.
+#2. Why Protein Search (nr) is the "Decisive Test"
+	#* Deep evolutionary sight: Protein-level searches use substitution matrices (like BLOSUM62), which know that certain amino acids behave similarly (e.g., swapping Isoleucine for Leucine is a "chemically silent" change).
+	#* The True Test: By translating your query and searching against nr (using a tool like blastx), you can detect incredibly faint, ancient evolutionary signals that raw DNA comparisons (blastn) completely miss. In de novo gene literature, if your sequence matches anything in nr, it is immediately excluded from being a true de novo gene.
+## 3. Why Use a Lenient E-value (1e-3 instead of 1e-5)?
+	#* Discovery vs. Exclusion: When looking for a specific gene, you want a strict E-value (like $10^{-5}$ or $10^{-10}$) so you only get certain, high-quality matches.
+	#* Erring on the side of caution: Here, your goal is exclusion—you want to catch any potential hint of an old relative. By loosening the threshold to $10^{-3}$ ($1e-3$), you are telling BLAST: "Show me even the faintest, most borderline matches." A borderline match means your candidate is suspicious and should be discarded, not kept.
+## 4. Why Use -seg yes?
+	#* Masking "Junk" Repetitions: Many non-coding regions have low-complexity sequences (like ATATATATAT or AAAAAA).
+	#* Preventing Fake Matches: If your candidate gene has a repetitive string of text, it might accidentally match a repetitive string in a completely unrelated gene. Turning -seg yes on "blurs out" these low-complexity zones so BLAST only focuses on meaningful sequence data.
+## 5. Why use nt only as a Secondary Check?
+	#The text notes that nt shouldn't be ignored entirely, but it serves a different purpose. A secondary blastn against nt is used to catch:
+	#* RNA genes: Functional genes that never turn into proteins (like tRNAs or lncRNAs), which won't show up in a protein (nr) database.
+	#* Pseudogenes: "Dead" genes that have suffered mutations throwing off their reading frames (no clear Open Reading Frame), meaning they can no longer be cleanly translated into a protein sequence but still share DNA sequence identity.
+	
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 #In mopheus
+
+#Get some space
+cd ~/pavo
+find . -type f ! \( -name "*.sh" -o -name "*.R" -o -name "*.py" -o -name "*.pl" \) -delete
+cd ~/Dros_rna
+find . -type f ! \( -name "*.sh" -o -name "*.R" -o -name "*.py" -o -name "*.pl" \) -delete
 
 #Install latest blast+
 	cd
@@ -322,13 +356,19 @@ bedtools getfasta -fi /media/aswin/SCFR/SCFR-main/genomes/human/GCA_009914755.4_
 	mkdir -p ~/tools
 	tar -xzf ncbi-blast-2.17.0+-x64-linux.tar.gz -C ~/tools/
 
-#Download nr database in
+#Download nr database
 	#space required before downloading
 	mkir ~/blastdb_new/nr
 	cd ~/blastdb_new/nr
 	curl -s https://ftp.ncbi.nlm.nih.gov/blast/db/nt-nucl-metadata.json | python3 -m json.tool
 	#315m0.730s
 	nohup ~/blastdb_new/nr/download_nr.sh > ~/blastdb_new/nr/nr_download.log 2>&1 &
+
+#Download nt database
+	mkir ~/blastdb_new/nt
+	cd ~/blastdb_new/nt
+	curl -s https://ftp.ncbi.nlm.nih.gov/blast/db/nt-nucl-metadata.json | python3 -m json.tool | grep -E "bytes-total"
+	nohup ~/blastdb_new/nt/download_nt.sh > ~/blastdb_new/nt/nt_download.log 2>&1 &
 
 #Prepare inputs
 	mkdir -p ~/aswin/SCFR/Fourier_analysis/nr_blast
@@ -370,7 +410,7 @@ awk '{
     gsub(/[:-]/, " ", $1)
     split($1, a)
     print a[1] "\t" a[2] "\t" a[3] "\tSub:" $2 ",Len:" $4 ",Qcov:" $11 ",%id:" $12 ",Eval:" $7
-}' human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx.tsv > human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_hits.bed
+}' human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx.tsv > human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_all_hits.bed
 
 #More concise table of blastx hits (one subject hit at same location is shown only once)
 awk '
@@ -406,11 +446,19 @@ END {
     for (k in best_row) {
         print best_row[k] "\tHits:" count[k]
     }
-}' human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx.tsv > human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_hits.bed
+}' human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx.tsv > human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_unique_hits.bed
 
-sort -u human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_hits.bed > human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_hits_unique.bed
+sort -u human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_unique_hits.bed > human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_hits_unique.bed
 
-#scp human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_hits.bed human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_and_nrblastx_hits.bed ceglab8@172.28.65.118:~/Downloads/SCFR
+scp check_scfr_fasta.sh \
+human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx.tsv \
+human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_all_hits.bed \
+human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_unique_hits.bed ceglab25@172.28.65.125:/media/aswin/SCFR/SCFR-main/Fourier_analysis/human/300/nr_blast/
+
+scp human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx.tsv \
+human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_all_hits.bed \
+human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_unique_hits.bed ceglab8@172.28.65.118:~/Downloads/SCFR
+
 #scp human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx.tsv  human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastx_hits.bed stdout_blastx_run.out ceglab25@172.28.65.125:/media/aswin/SCFR/SCFR-main/Fourier_analysis/human/300/nr_blast/
 
 #In ceglab25
@@ -424,7 +472,8 @@ human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology.bed \
 human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_dft_results.bed \
 human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results.bed \
 human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene.bed \
-human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_and_nrblastx_hits.bed filtering_intergenic_SCFR/
+human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_and_nrblastx_hits.bed \
+nr_blast/human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged.bed filtering_intergenic_SCFR/
 
 awk -F "\t" 'BEGIN{OFS="\t"} {print ($3 - $2), $0}' human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.3_dft_results.bed | sort -k1,1nr | cut -f2- > length_sorted_human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.3_dft_results.bed
 
