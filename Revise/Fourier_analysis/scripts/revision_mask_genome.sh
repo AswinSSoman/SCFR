@@ -417,13 +417,14 @@ find . -type f ! \( -name "*.sh" -o -name "*.R" -o -name "*.py" -o -name "*.pl" 
 	mkir ~/blastdb_new/nr
 	cd ~/blastdb_new/nr
 	curl -s https://ftp.ncbi.nlm.nih.gov/blast/db/nt-nucl-metadata.json | python3 -m json.tool
-	#315m0.730s
+	#315m0.730s (825Gb)
 	nohup ~/blastdb_new/nr/download_nr.sh > ~/blastdb_new/nr/nr_download.log 2>&1 &
 
 #Download nt database
 	mkir ~/blastdb_new/nt
 	cd ~/blastdb_new/nt
 	curl -s https://ftp.ncbi.nlm.nih.gov/blast/db/nt-nucl-metadata.json | python3 -m json.tool | grep -E "bytes-total"
+#816m31.569s (1001Gb)
 	nohup ~/blastdb_new/nt/download_nt.sh > ~/blastdb_new/nt/nt_download.log 2>&1 &
 
 #Prepare inputs
