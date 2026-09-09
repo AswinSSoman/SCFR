@@ -434,7 +434,7 @@ nohup bash -c 'time /home/morpheus/tools/ncbi-blast-2.17.0+/bin/blastn \
  -db /home/morpheus/blastdb_new/nt/nt \
  -out human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_merged_results_blastn.tsv \
  -outfmt "6 qseqid sseqid qlen length qstart qend evalue bitscore score qcovs qcovhsp pident nident mismatch gaps sstrand" \
- -evalue 1e-3 \
+ -evalue 1e-2 \
  -num_threads 56 \
  -max_target_seqs 10' &> stdout_blastn_run.out &
 
