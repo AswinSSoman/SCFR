@@ -106,10 +106,15 @@ bedtools getfasta -fi /media/aswin/SCFR/SCFR-main/genomes/human/GCA_009914755.4_
 time python3 /media/aswin/programs/CPC2_standalone-1.0.1/bin/CPC2.py -i cds.fa -o cpc2_cds
 
 
+bedtools getfasta -fi /media/aswin/SCFR/SCFR-main/genomes/human/GCA_009914755.4_T2T-CHM13v2.0_genomic.fna -bed <(awk '$3-$2>=300' ../final_gtf_features/cds_unique.bed) -s -name+ > cds_unique_atleast_300.fa
+time python3 /media/aswin/programs/CPC2_standalone-1.0.1/bin/CPC2.py -i cds_unique_atleast_300.fa -o cpc2_cds_unique_atleast_300
+awk '{print$1,$NF}' cpc2_cds_unique_atleast_300.txt | cut -f3- -d ":" | tr ":-" " " | tr -d "()-+" | tr " " "\t" | grep -v "^#" > cpc2_cds_unique_atleast_300.bed
 
 
 
+awk '{print$3-$2}' ../final_gtf_features/genes.bed | awk '$1<300' | ../term_hist2.py -b 200 -H 40 | less -SNRq
 
+bedtools getfasta -fi /media/aswin/SCFR/SCFR-main/genomes/human/GCA_009914755.4_T2T-CHM13v2.0_genomic.fna -bed ../cds.bed -s -name+ > cds.fa
 
 
 
