@@ -49,4 +49,18 @@ python3 /media/aswin/programs/CPC2_standalone-1.0.1/bin/CPC2.py -i ACTA1_gene.fa
 # For this reason, this gene is being represented as non-coding. Sequence comparisons to other primates indicates that no other primate is predicted to contain an open reading frame. [provided by RefSeq, Feb 2017]
 
 
+#Potential to code for short peptide
+
+#(CLLU1 as an emerging biomarker in chronic lymphoid leukemia (Chunmeng Rong, 20 March 2024)  https://link.springer.com/article/10.1007/s13577-024-01051-4)
+
+#Previous studies considered CLLU1 to be a non-coding RNA; however, recent research has discovered that its coding sequence region possesses the potential to encode a short peptide similar to interleukin-4.
+#Remarkably, abnormally elevated expression of CLLU1 has only been detected in chronic lymphoid leukemia among all hematological cancers. 
+#High CLLU1 expression often indicates more malignant pathological features and an unfavorable prognosis for patients.
+
+#CLLU1 is located on chromosome 12q22 and comprises three exons, flanked by BTG1 and EEA1.
+#It encodes six mRNA transcripts that do not exhibit sequence homology with any known genes.
+#Among these transcripts, CLLU1-203 and the coding sequence (CDS) display the highest expression levels.
+#The majority of these transcripts cluster on chromosome 12q22, with most being non-coding, while a few, such as cDNA 4 and 5, potentially encode a peptide similar to interleukin-4 (IL-4).
+#The CDS likely encodes a short peptide chain consisting of 121 amino acids
+
 
