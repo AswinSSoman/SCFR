@@ -63,4 +63,34 @@ python3 /media/aswin/programs/CPC2_standalone-1.0.1/bin/CPC2.py -i ACTA1_gene.fa
 #The majority of these transcripts cluster on chromosome 12q22, with most being non-coding, while a few, such as cDNA 4 and 5, potentially encode a peptide similar to interleukin-4 (IL-4).
 #The CDS likely encodes a short peptide chain consisting of 121 amino acids
 
+Protein Binding to Cis-Motifs in mRNAs Coding Sequence Is Common and Regulates Transcript Stability and the Rate of Translation [https://doi.org/10.3390/cells10112910]
+
+
+tblastn \
+  -db /media/aswin/SCFR/SCFR-main/genomes/human/GCA_009914755.4_T2T-CHM13v2.0_genomic.fna \
+  -query CLLU1_protein.fa \
+  -num_threads $(nproc) \
+  -max_target_seqs 10 \
+  -evalue 1e-5 \
+  -outfmt "6 sseqid sstart send qseqid bitscore sstrand" | \
+awk 'BEGIN {OFS="\t"} {
+  # Assign strand (+ or -)
+  strand = ($6 == "minus") ? "-" : "+";
+  
+  # Ensure sstart is smaller than send for start/end coordinates
+  if ($2 < $3) {
+    start = $2 - 1; # Convert 1-based BLAST to 0-based BED start
+    end = $3;
+  } else {
+    start = $3 - 1;
+    end = $2;
+  }
+  
+  print $1, start, end, $4, $5, strand;
+}' > tblastn_hits.bed
+
+
+
+bedtools getfasta -fi /media/aswin/SCFR/SCFR-main/genomes/human/GCA_009914755.4_T2T-CHM13v2.0_genomic.fna -bed tblastn_hits.bed -s -name+ > CLLU1_orf.fa
+
 
