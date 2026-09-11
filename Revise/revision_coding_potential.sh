@@ -94,3 +94,38 @@ awk 'BEGIN {OFS="\t"} {
 bedtools getfasta -fi /media/aswin/SCFR/SCFR-main/genomes/human/GCA_009914755.4_T2T-CHM13v2.0_genomic.fna -bed tblastn_hits.bed -s -name+ > CLLU1_orf.fa
 
 
+
+mkdir /media/aswin/SCFR/SCFR-main/Fourier_analysis/human/300/Coding_potential
+time python3 /media/aswin/programs/CPC2_standalone-1.0.1/bin/CPC2.py -i human_scfr_all_atleast_300bp_cds_unique.fa -o Coding_potential/human_scfr_all_atleast_300bp_cds_unique_cpc2
+
+cd /media/aswin/SCFR/SCFR-main/Fourier_analysis/human/300/Coding_potential
+awk '{if($NF=="noncoding") print$1}' human_scfr_all_atleast_300bp_cds_unique_cpc2.txt | cut -f3- -d ":" | tr ":-" "\t" | grep -v "^#" | tr -d "()+-" > cds_scfrs_with_cpc2_non_coding_status.bed
+awk '{if($NF=="coding") print$1}' human_scfr_all_atleast_300bp_cds_unique_cpc2.txt | cut -f3- -d ":" | tr ":-" "\t" | grep -v "^#" | tr -d "()+-" > cds_scfrs_with_cpc2_coding_status.bed
+
+bedtools getfasta -fi /media/aswin/SCFR/SCFR-main/genomes/human/GCA_009914755.4_T2T-CHM13v2.0_genomic.fna -bed ../cds.bed -s -name+ > cds.fa
+time python3 /media/aswin/programs/CPC2_standalone-1.0.1/bin/CPC2.py -i cds.fa -o cpc2_cds
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
