@@ -56,4 +56,10 @@ time python3 annotate_scfr_cpc2.py \
   --unmatched scfr_no_cpc2_match.bed
   
   
-  
+grep -w coding scfr_with_cpc2_status.tsv | awk '{print$1,$2,$3,$7,1,$6}' OFS="\t"
+bedtools getfasta -fi /media/aswin/SCFR/SCFR-main/genomes/human/GCA_009914755.4_T2T-CHM13v2.0_genomic.fna -bed <(grep -w coding scfr_with_cpc2_status.tsv | awk '{print$1,$2,$3,$7,1,$6}' OFS="\t") -s -name+ 
+
+bedtools intersect -a <(grep -w coding scfr_with_cpc2_status.tsv | awk '{print$1,$2,$3,$7,1,$6}' OFS="\t") -b <(grep -v "^chrM" Repetitive_Elements.bed)
+
+
+
