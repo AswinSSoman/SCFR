@@ -47,3 +47,13 @@ grep -v '^#track' cpc2_human_scfr_all_atleast_300bp.gff3 | sort -k1,1 -k4,4n | b
 tabix -p gff cpc2_human_scfr_all_atleast_300bp.gff3.gz
 
 scp cpc2_human_scfr_all_atleast_300bp.gff3.gz cpc2_human_scfr_all_atleast_300bp.gff3.gz.tbi ceglab8@172.28.65.118:~/Downloads/SCFR/
+
+
+time python3 annotate_scfr_cpc2.py \
+  human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_and_ntblastn_hits.bed \
+  Coding_potential/cpc2_human_scfr_all_atleast_300bp.txt \
+  -o scfr_with_cpc2_status.tsv \
+  --unmatched scfr_no_cpc2_match.bed
+  
+  
+  
