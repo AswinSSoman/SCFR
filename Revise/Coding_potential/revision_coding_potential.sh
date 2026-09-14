@@ -41,14 +41,17 @@ time python3 /media/aswin/programs/CPC2_standalone-1.0.1/bin/CPC2.py -i human_sc
 
 #Convert CPC2 output text to gff to be compatible to view more details when clicked 
 time python3 ./cpc2_to_gff3.py cpc2_human_scfr_all_atleast_300bp.txt
+#87m7.050s
 time python3 ./cpc2_to_gff3.py cpc2_human_scfr_all_lesser_than_300bp.txt
 
 #If it's slow to load, index it:
 grep -v '^#track' cpc2_human_scfr_all_atleast_300bp.gff3 | sort -k1,1 -k4,4n | bgzip > cpc2_human_scfr_all_atleast_300bp.gff3.gz
 tabix -p gff cpc2_human_scfr_all_atleast_300bp.gff3.gz
 
-grep -v '^#track' cpc2_human_scfr_all_lesser_than_300bp.gff3 | sort -k1,1 -k4,4n | bgzip > cpc2_human_scfr_all_lesser_than_300bp.gff3.gz
-tabix -p gff cpc2_human_scfr_all_lesser_than_300bp.gff3.gz
+#
+time grep -v '^#track' cpc2_human_scfr_all_lesser_than_300bp.gff3 | sort -k1,1 -k4,4n | bgzip > cpc2_human_scfr_all_lesser_than_300bp.gff3.gz
+#
+time tabix -p gff cpc2_human_scfr_all_lesser_than_300bp.gff3.gz
 
 scp  cpc2_human_scfr_all_atleast_300bp.gff3.gz cpc2_human_scfr_all_atleast_300bp.gff3.gz.tbi \
   ceglab8@172.28.65.118:~/Downloads/SCFR/
