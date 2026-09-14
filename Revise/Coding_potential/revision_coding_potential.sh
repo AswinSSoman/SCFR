@@ -27,7 +27,7 @@ cd /media/aswin/SCFR/SCFR-main/Fourier_analysis/human/300/Coding_potential
 time awk -F "\t" '($3-$2)<300' /media/aswin/SCFR/SCFR-main/exon_shadow/human/human_scfr_all.bed > human_scfr_all_lesser_than_300bp.bed
 #44m9.003s
 time bedtools getfasta -fi /media/aswin/SCFR/SCFR-main/genomes/human/GCA_009914755.4_T2T-CHM13v2.0_genomic.fna -bed human_scfr_all_lesser_than_300bp.bed -s -name+ > human_scfr_all_lesser_than_300bp.fa
-#
+#912m3.824s
 time python3 /media/aswin/programs/CPC2_standalone-1.0.1/bin/CPC2.py -i human_scfr_all_lesser_than_300bp.fa -o cpc2_human_scfr_all_lesser_than_300bp
 
 
@@ -40,23 +40,33 @@ time python3 /media/aswin/programs/CPC2_standalone-1.0.1/bin/CPC2.py -i human_sc
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 #Convert CPC2 output text to gff to be compatible to view more details when clicked 
-time python3 ./cpc2_to_gff3.py cpc2_human_scfr_all_atleast_300bp.txt 
+time python3 ./cpc2_to_gff3.py cpc2_human_scfr_all_atleast_300bp.txt
+time python3 ./cpc2_to_gff3.py cpc2_human_scfr_all_lesser_than_300bp.txt
 
 #If it's slow to load, index it:
 grep -v '^#track' cpc2_human_scfr_all_atleast_300bp.gff3 | sort -k1,1 -k4,4n | bgzip > cpc2_human_scfr_all_atleast_300bp.gff3.gz
 tabix -p gff cpc2_human_scfr_all_atleast_300bp.gff3.gz
 
-scp cpc2_human_scfr_all_atleast_300bp.gff3.gz cpc2_human_scfr_all_atleast_300bp.gff3.gz.tbi ceglab8@172.28.65.118:~/Downloads/SCFR/
+grep -v '^#track' cpc2_human_scfr_all_lesser_than_300bp.gff3 | sort -k1,1 -k4,4n | bgzip > cpc2_human_scfr_all_lesser_than_300bp.gff3.gz
+tabix -p gff cpc2_human_scfr_all_lesser_than_300bp.gff3.gz
+
+scp  cpc2_human_scfr_all_atleast_300bp.gff3.gz cpc2_human_scfr_all_atleast_300bp.gff3.gz.tbi \
+  ceglab8@172.28.65.118:~/Downloads/SCFR/
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
+#Annotate an SCFR BED file with CPC2 coding/noncoding status.
 time python3 annotate_scfr_cpc2.py \
   human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_and_ntblastn_hits.bed \
   Coding_potential/cpc2_human_scfr_all_atleast_300bp.txt \
   -o scfr_with_cpc2_status.tsv \
   --unmatched scfr_no_cpc2_match.bed
-  
-  
+
+#SCFRs with coding status
 grep -w coding scfr_with_cpc2_status.tsv | awk '{print$1,$2,$3,$7,1,$6}' OFS="\t"
+
+#
 bedtools getfasta -fi /media/aswin/SCFR/SCFR-main/genomes/human/GCA_009914755.4_T2T-CHM13v2.0_genomic.fna -bed <(grep -w coding scfr_with_cpc2_status.tsv | awk '{print$1,$2,$3,$7,1,$6}' OFS="\t") -s -name+ 
 
 bedtools intersect -a <(grep -w coding scfr_with_cpc2_status.tsv | awk '{print$1,$2,$3,$7,1,$6}' OFS="\t") -b <(grep -v "^chrM" Repetitive_Elements.bed)
