@@ -77,17 +77,20 @@ bedtools getfasta -fi /media/aswin/SCFR/SCFR-main/genomes/human/GCA_009914755.4_
 bedtools intersect -a <(grep -w coding scfr_with_cpc2_status.tsv | awk '{print$1,$2,$3,$7,1,$6}' OFS="\t") -b <(grep -v "^chrM" Repetitive_Elements.bed)
 
 
-
+#Observations of 3 SCFRs with coding potential:
 >NC_060926.1	68462816	68463848	3	1	+	SCFR_NC_060926_1_68462816_68463848_frame3_fft	5;3;0.444767;0.148256;0.333333;483.194;167.722;147.049;2;7;3	frame+coords	3::NC_060926.1:68462816-68463848(+)	1032	281	0.37781000000000003	9.460429191589355	1	0.99932	coding
-For ucsc visualization: chr2:68,456,185-68,482,903
-This region is shared only with chimpanzee & pygmy chim chain, absent in other primates
-Contain simple repeats, a LINE elment is also inserted 
-These feaetures are absent in nearby genes
+	-For ucsc visualization: chr2:68,456,185-68,482,903
+	-This region is shared only with chimpanzee & pygmy chim chain, absent in other primates
+	-Contain simple repeats, a LINE elment is also inserted 
+	-These features are absent in nearby genes
 
 >NC_060927.1	109352916	109353879	-1	1	-	SCFR_NC_060927_1_109352916_109353879_frame_1_fft	9;3;0.444444;0.333333;0.389408;313.356;206.221;188.980;2;3;3	frame+coords	-1::NC_060927.1:109352916-109353879(-)	963	180	0.36944000000000005	10.11052837371826	1	0.888501	coding	
-only chimp, not even pygmy chimp share this region
-
+	-Only chimp shared this region that too very fragmented, not even pygmy chimp share this region
+	-Structural variants present tis region
+	-Simple repeats present in this region 
+	-These features are absent in nearby genes
 
 >NC_060929.1	1761824	1762922	3	1	+	SCFR_NC_060929_1_1761824_1762922_frame3_fft	6;3;0.493625;0.495446;0.333333;405.225;353.389;201.383;2;2;3	frame+coords	3::NC_060929.1:1761824-1762922(+)	1098	325	0.34168	7.750473976135253	10.9999	coding	
-
+	-Shared with chimp, pygmy chimp & even gorilla
+	-This region is unique to the T2T-CHM13 v2.0 assembly compared to the GRCh38/hg38 and GRCh37/hg19 reference assemblies.
 
