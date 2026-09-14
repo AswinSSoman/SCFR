@@ -48,13 +48,12 @@ time python3 ./cpc2_to_gff3.py cpc2_human_scfr_all_lesser_than_300bp.txt
 grep -v '^#track' cpc2_human_scfr_all_atleast_300bp.gff3 | sort -k1,1 -k4,4n | bgzip > cpc2_human_scfr_all_atleast_300bp.gff3.gz
 tabix -p gff cpc2_human_scfr_all_atleast_300bp.gff3.gz
 
-#
+#99m34.365s
 time grep -v '^#track' cpc2_human_scfr_all_lesser_than_300bp.gff3 | sort -k1,1 -k4,4n | bgzip > cpc2_human_scfr_all_lesser_than_300bp.gff3.gz
-#
+#6m7.863s
 time tabix -p gff cpc2_human_scfr_all_lesser_than_300bp.gff3.gz
 
-scp  cpc2_human_scfr_all_atleast_300bp.gff3.gz cpc2_human_scfr_all_atleast_300bp.gff3.gz.tbi \
-  ceglab8@172.28.65.118:~/Downloads/SCFR/
+scp  cpc2_human_scfr_all_atleast_300bp.gff3.gz cpc2_human_scfr_all_atleast_300bp.gff3.gz.tbi cpc2_human_scfr_all_lesser_than_300bp.gff3.gz cpc2_human_scfr_all_lesser_than_300bp.gff3.gz.tbi ceglab8@172.28.65.118:~/Downloads/SCFR/
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -69,10 +68,26 @@ time python3 annotate_scfr_cpc2.py \
 #SCFRs with coding status
 grep -w coding scfr_with_cpc2_status.tsv | awk '{print$1,$2,$3,$7,1,$6}' OFS="\t"
 
+#Convert the 84 SCFRs with DFT & CPC2 results into ucsc compatible bed 
+python3 scfr_with_cpc2_status_to_ucsc_custom_track.py scfr_with_cpc2_status.tsv -o scfr_with_cpc2_status_ucsc.bed
+
 #
 bedtools getfasta -fi /media/aswin/SCFR/SCFR-main/genomes/human/GCA_009914755.4_T2T-CHM13v2.0_genomic.fna -bed <(grep -w coding scfr_with_cpc2_status.tsv | awk '{print$1,$2,$3,$7,1,$6}' OFS="\t") -s -name+ 
 
 bedtools intersect -a <(grep -w coding scfr_with_cpc2_status.tsv | awk '{print$1,$2,$3,$7,1,$6}' OFS="\t") -b <(grep -v "^chrM" Repetitive_Elements.bed)
 
+
+
+>NC_060926.1	68462816	68463848	3	1	+	SCFR_NC_060926_1_68462816_68463848_frame3_fft	5;3;0.444767;0.148256;0.333333;483.194;167.722;147.049;2;7;3	frame+coords	3::NC_060926.1:68462816-68463848(+)	1032	281	0.37781000000000003	9.460429191589355	1	0.99932	coding
+For ucsc visualization: chr2:68,456,185-68,482,903
+This region is shared only with chimpanzee & pygmy chim chain, absent in other primates
+Contain simple repeats, a LINE elment is also inserted 
+These feaetures are absent in nearby genes
+
+>NC_060927.1	109352916	109353879	-1	1	-	SCFR_NC_060927_1_109352916_109353879_frame_1_fft	9;3;0.444444;0.333333;0.389408;313.356;206.221;188.980;2;3;3	frame+coords	-1::NC_060927.1:109352916-109353879(-)	963	180	0.36944000000000005	10.11052837371826	1	0.888501	coding	
+only chimp, not even pygmy chimp share this region
+
+
+>NC_060929.1	1761824	1762922	3	1	+	SCFR_NC_060929_1_1761824_1762922_frame3_fft	6;3;0.493625;0.495446;0.333333;405.225;353.389;201.383;2;2;3	frame+coords	3::NC_060929.1:1761824-1762922(+)	1098	325	0.34168	7.750473976135253	10.9999	coding	
 
 
