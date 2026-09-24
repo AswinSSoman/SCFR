@@ -100,16 +100,35 @@ awk 'NR > 1 { count[$NF]++; total++ } END { for (val in count) printf "%s: %d (%
 
 
 
-#Merge coding & homology status
-bed=../filtering_intergenic_SCFR/human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology.bed
-cpc=cpc2_human_scfr_all_atleast_300bp.txt
+#Merge coding & intergenic status
+awk -F'\t' -v OFS='\t' -v tag="intergenic" -v other="genic" '
+  NR==FNR { key[$4 "::" $1 ":" $2 "-" $3 "(" $6 ")"] = 1; next }
+  /^#/    { print $0, "Region_type"; next }
+  { print $0, ($1 in key ? tag : other) }
+' ../filtering_intergenic_SCFR/human_scfr_all_atleast_300bp_only_intergenic_unique.bed cpc2_human_scfr_all_atleast_300bp.txt > cpc2_human_scfr_all_atleast_300bp_with_intergenic_info.txt
 
 awk -F'\t' -v OFS='\t' -v tag="No_homology" -v other="homology" '
   NR==FNR { key[$4 "::" $1 ":" $2 "-" $3 "(" $6 ")"] = 1; next }
   /^#/    { print $0, "homology_status"; next }
   { print $0, ($1 in key ? tag : other) }
-' "$bed" "$cpc" > cpc2_human_scfr_all_atleast_300bp_with_homology.txt
+' ../filtering_intergenic_SCFR/human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology.bed cpc2_human_scfr_all_atleast_300bp.txt > cpc2_human_scfr_all_atleast_300bp_with_intergenic_homology_info.txt
+
+#Merge coding & homology status
+awk -F'\t' -v OFS='\t' -v tag="No_homology" -v other="homology" '
+  NR==FNR { key[$4 "::" $1 ":" $2 "-" $3 "(" $6 ")"] = 1; next }
+  /^#/    { print $0, "Homology_status"; next }
+  { print $0, ($1 in key ? tag : other) }
+' ../filtering_intergenic_SCFR/human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology.bed cpc2_human_scfr_all_atleast_300bp_with_intergenic_info.txt > cpc2_human_scfr_all_atleast_300bp_with_intergenic_homology_info.txt
+
 
 #Count amount of homology
+./crosstab.sh -f cpc2_human_scfr_all_atleast_300bp_with_intergenic_info.txt
+./crosstab.sh -f cpc2_human_scfr_all_atleast_300bp_with_intergenic_homology_info.txt 
+awk -F "\t" '{print$(NF-2),$(NF-1), $NF}' cpc2_human_scfr_all_atleast_300bp_with_intergenic_homology_info.txt | sort | uniq -c
+
 awk 'NR > 1 { count[$NF]++; total++ } END { for (val in count) printf "%s: %d (%.2f%%)\n", val, count[val], (count[val]/total)*100 }' cpc2_human_scfr_all_atleast_300bp_with_homology.txt
+./crosstab.sh -f cpc2_human_scfr_all_atleast_300bp_with_homology.txt -r -2 -c -1
+
+
+
 
