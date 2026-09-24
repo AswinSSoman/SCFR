@@ -57,7 +57,6 @@ scp  cpc2_human_scfr_all_atleast_300bp.gff3.gz cpc2_human_scfr_all_atleast_300bp
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
 #Annotate an SCFR BED file with CPC2 coding/noncoding status.
 time python3 annotate_scfr_cpc2.py \
   human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology_with_0.33_dft_results_no_overlap_with_gene_and_ntblastn_hits.bed \
@@ -93,4 +92,24 @@ bedtools intersect -a <(grep -w coding scfr_with_cpc2_status.tsv | awk '{print$1
 >NC_060929.1	1761824	1762922	3	1	+	SCFR_NC_060929_1_1761824_1762922_frame3_fft	6;3;0.493625;0.495446;0.333333;405.225;353.389;201.383;2;2;3	frame+coords	3::NC_060929.1:1761824-1762922(+)	1098	325	0.34168	7.750473976135253	10.9999	coding	
 	-Shared with chimp, pygmy chimp & even gorilla
 	-This region is unique to the T2T-CHM13 v2.0 assembly compared to the GRCh38/hg38 and GRCh37/hg19 reference assemblies.
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+awk 'NR > 1 { count[$NF]++; total++ } END { for (val in count) printf "%s: %d (%.2f%%)\n", val, count[val], (count[val]/total)*100 }' cpc2_human_scfr_all_atleast_300bp.txt
+
+
+
+#Merge coding & homology status
+bed=../filtering_intergenic_SCFR/human_scfr_all_atleast_300bp_only_intergenic_unique_with_no_homology.bed
+cpc=cpc2_human_scfr_all_atleast_300bp.txt
+
+awk -F'\t' -v OFS='\t' -v tag="No_homology" -v other="homology" '
+  NR==FNR { key[$4 "::" $1 ":" $2 "-" $3 "(" $6 ")"] = 1; next }
+  /^#/    { print $0, "homology_status"; next }
+  { print $0, ($1 in key ? tag : other) }
+' "$bed" "$cpc" > cpc2_human_scfr_all_atleast_300bp_with_homology.txt
+
+#Count amount of homology
+awk 'NR > 1 { count[$NF]++; total++ } END { for (val in count) printf "%s: %d (%.2f%%)\n", val, count[val], (count[val]/total)*100 }' cpc2_human_scfr_all_atleast_300bp_with_homology.txt
 
